@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Uma cartinha pra você</title>
+  <style>
+    :root{
+      --bg1:#0b0b12;
+      --bg2:#120b12;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --stroke: rgba(255,255,255,.14);
+      --glow: rgba(255, 75, 120, .35);
+      --accent: #ff4b78;
+      --accent2:#ffb86b;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(255,75,120,.25), transparent 60%),
+        radial-gradient(700px 500px at 80% 30%, rgba(255,184,107,.18), transparent 60%),
+        radial-gradient(900px 700px at 50% 100%, rgba(130,90,255,.14), transparent 55%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+      padding:24px;
+    }
+
+    /* corações flutuando */
+    .hearts{
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.55;
+      filter: drop-shadow(0 0 10px rgba(255,75,120,.18));
+    }
+    .heart{
+      position:absolute;
+      font-size:18px;
+      animation: floatUp linear infinite;
+      opacity:.0;
+    }
+    @keyframes floatUp{
+      0%{ transform: translateY(20px) scale(.9); opacity:0; }
+      10%{ opacity:.55; }
+      100%{ transform: translateY(-120vh) scale(1.2); opacity:0; }
+    }
+
+    /* ✅ LAYOUT: ESQ | CARTA | DIR */
+    .wrap{
+      width:min(1100px, 100%);
+      display:grid;
+      grid-template-columns: 220px 1fr 220px;
+      gap:22px;
+      align-items:start;
+      position:relative;
+    }
+
+    .card{
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:22px;
+      padding:28px;
+      box-shadow:
+        0 18px 50px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+      backdrop-filter: blur(10px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(600px 220px at 30% 0%, rgba(255,75,120,.18), transparent 60%),
+                  radial-gradient(600px 220px at 70% 0%, rgba(255,184,107,.12), transparent 60%);
+      pointer-events:none;
+    }
+
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      position:relative;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.3px;
+      user-select:none;
+    }
+
+    .dot{
+      width:10px; height:10px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow: 0 0 18px var(--glow);
+    }
+
+    h1{
+      margin:18px 0 10px;
+      font-size: clamp(26px, 4.6vw, 40px);
+      line-height:1.1;
+      letter-spacing:-.8px;
+      position:relative;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 18px;
+      font-size:15px;
+      line-height:1.6;
+      position:relative;
+    }
+
+    .divider{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+      margin:18px 0;
+      position:relative;
+    }
+
+    .letter{
+      position:relative;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:18px 18px 14px;
+    }
+
+    .letter p{
+      margin:0 0 12px;
+      color: rgba(255,255,255,.9);
+      font-size:16px;
+      line-height:1.75;
+    }
+
+    .sig{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .pill .mini{
+      width:8px; height:8px;
+      border-radius:50%;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 14px rgba(255,75,120,.22);
+    }
+
+    .footer{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      position:relative;
+    }
+
+    .tag{
+      font-size:12px;
+      color: rgba(255,255,255,.74);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+
+    /* ✅ QUADRADOS LATERAIS */
+    .side{
+      position:relative;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:12px;
+      overflow:hidden;
+      box-shadow:
+        0 18px 50px rgba(0,0,0,.35),
+        0 0 0 1px rgba(255,255,255,.05) inset;
+      backdrop-filter: blur(10px);
+    }
+
+    .side::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(420px 180px at 30% 0%, rgba(255,75,120,.14), transparent 60%),
+        radial-gradient(420px 180px at 70% 0%, rgba(255,184,107,.10), transparent 60%);
+      pointer-events:none;
+    }
+
+    .sideTitle{
+      position:relative;
+      margin:2px 2px 10px;
+      font-size:13px;
+      color:var(--muted);
+      letter-spacing:.2px;
+      user-select:none;
+    }
+
+    .sideGrid{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    .photoBox{
+      aspect-ratio:1/1;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      position:relative;
+    }
+
+    .photoBox img,
+    .photoBox video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .photoBox:hover{
+      transform: translateY(-2px) scale(1.02);
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 45px rgba(0,0,0,.55);
+    }
+
+    /* modal simples */
+    .overlay{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      padding:22px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      z-index:10;
+    }
+    .overlay.active{ display:grid; }
+    .modal{
+      width:min(520px, 100%);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      box-shadow: 0 25px 70px rgba(0,0,0,.6);
+      padding:18px;
+    }
+    .modal h2{
+      margin:0 0 8px;
+      font-size:18px;
+      letter-spacing:-.2px;
+    }
+    .modal p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+    .actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn.primary{
+      border-color: rgba(255,75,120,.38);
+      background: rgba(255,75,120,.14);
+    }
+
+    @media (max-width:520px){
+      .card{ padding:20px; border-radius:18px; }
+      .letter{ padding:16px; }
+      .sig{ flex-direction:column; align-items:flex-start; }
+    }
+
+    /* ✅ Responsivo: vira coluna */
+    @media (max-width:980px){
+      .wrap{ grid-template-columns: 1fr; }
+      .card{ order:1; }
+      .side.left{ order:2; }
+      .side.right{ order:3; }
+    }
+
+    /* PAINEL INICIAL */
+    .startScreen{
+      position:fixed; inset:0;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(10px);
+      z-index:999;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .startBox{
+      width:min(520px, 100%);
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      box-shadow: 0 25px 70px rgba(0,0,0,.65);
+      padding:18px;
+      text-align:center;
+    }
+    .startBox h2{
+      margin:0 0 8px;
+      font-size:20px;
+      letter-spacing:-.2px;
+    }
+    .startBox p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    .startBtn{
+      width:100%;
+      border:1px solid rgba(255,75,120,.38);
+      background: rgba(255,75,120,.16);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:15px;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .startBtn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,75,120,.22);
+    }
+    .startScreen.hidden{
+      opacity:0;
+      pointer-events:none;
+      transform: translateY(6px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MÚSICA (coloque "musica.mp3" na mesma pasta) -->
+  <audio id="bgMusic" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- PAINEL INICIAL -->
+  <div class="startScreen" id="startScreen">
+    <div class="startBox">
+      <h2>Tenho uma cartinha pra você 💌</h2>
+      <p>Feito com carinho por Felipe para Luiza</p>
+      <button class="startBtn" id="openLetterBtn">Abrir a carta</button>
+    </div>
+  </div>
+
+  <!-- corações -->
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+
+  <main class="wrap">
+
+    <!-- ESQUERDA (2 quadrados com o MESMO vídeo em loop) -->
+    <aside class="side left">
+      <div class="sideTitle">A gente daqui um tempo ❤ </div>
+      <div class="sideGrid">
+        <div class="photoBox">
+          <video class="loopVideo" src="video1.mp4" muted playsinline autoplay loop preload="metadata"></video>
+        </div>
+        <div class="photoBox">
+          <video class="loopVideo" src="video2.mp4" muted playsinline autoplay loop preload="metadata"></video>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CARTA (MEIO) -->
+    <section class="card">
+      <div class="top">
+        <div class="badge">
+          <span class="dot"></span>
+          <span>Uma cartinha especial</span>
+        </div>
+
+        <div class="pill" id="openModal" title="Abrir mensagem extra">
+          <span class="mini"></span>
+          <span>ler um detalhe</span>
+        </div>
+      </div>
+
+      <h1>Pra você, Luiza</h1>
+      <p class="subtitle">
+        Eu só queria deixar escrito algo simples mas verdadeiro sobre o que eu sinto quando penso em você.
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="letter">
+        <p>
+          Desde que você apareceu, meus dias ficaram mais leves.
+          O seu jeito, o seu sorriso e principalmente o seu <strong>jeito</strong> têm um poder estranho de me acalmar
+          e, ao mesmo tempo, acelerar o meu coração.
+        </p>
+
+        <p>
+          Eu gosto de estar perto de você.
+          É o jeito que o silêncio entre nós nunca é vazio, das risadas sem sentido,
+          e daquele instante simples em que tudo parece ficar mais tranquilo só por você estar ali.
+        </p>
+
+        <p>
+          Não é sobre pressa. É sobre cuidado.
+          Eu só queria que você soubesse: você tem sido uma parte muito bonita dos meus dias.
+        </p>
+
+        <div class="sig">
+          <span>Com carinho,</span><br>
+          <strong>Felipe</strong>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="tag">❤</span>
+        <span class="tag">❤</span>
+        <span class="tag">❤</span>
+        <span class="tag">❤</span>
+      </div>
+    </section>
+
+    <!-- DIREITA (2 quadrados com FOTOS) -->
+<aside class="side right">
+  <div class="sideTitle">Nossas fotos atual (logo fora)</div>
+  <div class="sideGrid">
+    <div class="photoBox">
+      <img src="foto1.png" alt="Foto 1">
+    </div>
+    <div class="photoBox">
+      <img src="foto2.png" alt="Foto 2">
+    </div>
+  </div>
+</aside>
+
+  <!-- modal -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal">
+    <h2 id="mTitle">Um detalhe que eu adoro</h2>
+    <p>
+      Tem um detalhe em você que eu adoro…<br><br>
+      não é algo que dá pra ver, é algo que dá pra sentir.<br>
+      Sua energia é diferente. E eu gosto disso.
+    </p>
+    <div class="actions">
+      <button class="btn" id="closeModal">Fechar</button>
+      <button class="btn primary" id="copyText">Copiar frase</button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    // corações aleatórios
+    const hearts = document.getElementById('hearts');
+    const symbols = ["❤","💗","💞","💘"];
+    const total = 18;
+
+    for(let i=0;i<total;i++){
+      const h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+      h.style.left = Math.random()*100 + 'vw';
+      h.style.bottom = (-10 - Math.random()*60) + 'vh';
+      h.style.animationDuration = (9 + Math.random()*8) + 's';
+      h.style.animationDelay = (Math.random()*6) + 's';
+      h.style.fontSize = (14 + Math.random()*18) + 'px';
+      hearts.appendChild(h);
+    }
+
+    // modal
+const overlay = document.getElementById('overlay');
+document.getElementById('openModal').addEventListener('click', () => overlay.classList.add('active'));
+document.getElementById('closeModal').addEventListener('click', () => overlay.classList.remove('active'));
+overlay.addEventListener('click', (e) => { 
+  if(e.target === overlay) overlay.classList.remove('active'); 
+});
+
+// copiar frase
+document.getElementById('copyText').addEventListener('click', async () => {
+  const phrase = `Tem um detalhe em você que eu adoro…
+não é algo que dá pra ver, é algo que dá pra sentir.
+Sua energia é diferente. E eu gosto disso.`;
+
+  try {
+    await navigator.clipboard.writeText(phrase);
+    alert("Frase copiada! ❤");
+  } catch(err) {
+    alert("Não deu pra copiar automaticamente. Copie manualmente:\n\n" + phrase);
+  }
+});
+    // PAINEL INICIAL -> abre carta + toca música + libera autoplay dos vídeos
+    const startScreen = document.getElementById('startScreen');
+    const openLetterBtn = document.getElementById('openLetterBtn');
+    const music = document.getElementById('bgMusic');
+
+    openLetterBtn.addEventListener('click', async () => {
+      try{
+        music.volume = 0.3;
+        await music.play();
+      }catch(e){}
+
+      // garante que todos os vídeos iniciem (autoplay pode bloquear sem interação)
+      document.querySelectorAll('.loopVideo').forEach(v => {
+        v.muted = true;
+        v.loop = true;
+        v.play().catch(()=>{});
+      });
+
+      startScreen.classList.add('hidden');
+      setTimeout(() => startScreen.remove(), 350);
+    });
+  </script>
+</body>
+</html>
